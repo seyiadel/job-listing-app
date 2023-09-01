@@ -11,7 +11,7 @@ class ListingController extends Controller
     //Show All Listings
     public function index() {
         return view('listings.index', [
-            'listings' => Listing::latest()->filter(request(['tag', 'search']))->paginate(10)
+            'listings' => Listing::latest()->filter(request(['tag', 'search']))->paginate(4)
         ]);
     }
 
@@ -28,7 +28,7 @@ class ListingController extends Controller
     }
 
     // Store Listing Data   
-    public function  store(Request $request) {
+    public function store(Request $request) {
         $formFields = $request->validate([
             'title' => 'required',
             'company' => 'required', Rule::unique('listings, company'),
@@ -44,6 +44,8 @@ class ListingController extends Controller
             $formFields['logo'] = $request->file('logo')->store('logos', 'public');
         }
 
+        $formFields['user_id'] = auth()->id();
+
         Listing::create($formFields);
 
         return redirect('/')->with('message', 'Listing Created Successfully!');
@@ -58,6 +60,12 @@ class ListingController extends Controller
     }
 
     public function update(Request $request, Listing $listing) {
+
+        // Make sure user is logged in
+        if($listing->user_id != auth()->id()) {
+            abort(403, 'Unauthorized Action');
+        }
+
         $formFields = $request->validate([
             'title' => 'required',
             'company' => 'required',
@@ -81,9 +89,19 @@ class ListingController extends Controller
 
     // Delete Single Listing
     public function destroy(Listing $listing) {
+
+        // Make sure user is logged in
+        if($listing->user_id != auth()->id()) {
+            abort(403, 'Unauthorized Action');
+        }
         $listing->delete();
 
         return redirect('/')->with('message', 'Listing Deleted Successfully');
 
     }
+
+    // Manage Listing
+     public function manage() {
+        return view ('listings.manage', ['listings' => auth()->user()->listings()->get()]);
+     }
 }
