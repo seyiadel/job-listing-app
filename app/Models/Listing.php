@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Listing extends Model
 {
@@ -26,5 +27,10 @@ class Listing extends Model
     // Relationship to User
     public function user() {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    // Relationship to Applicants per Listing
+    public function applicants():HasMany {
+        return $this->hasMany(Applicant::class);
     }
 }

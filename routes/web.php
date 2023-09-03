@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ApplicantController;
 use App\Http\Controllers\ListingController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -57,3 +58,8 @@ Route::get('/login', [UserController::class, 'login'])->name('login')->middlewar
 // Log In User
 Route::post('/users/authenticate', [UserController::class, 'authenticate']);
 
+// Show Application Form
+Route::get('/{listing}/apply', [ApplicantController::class,  'create']);
+
+// Create Job Applicant
+Route::post('/apply', [ApplicantController::class, 'store']);
